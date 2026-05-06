@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserProfile {
+  id                   String   @id @default(cuid())
+  name                 String
+  bio                  String?
+  industry             String?
+  goals                String[]
+  brandVoice           String?
+  approvedPlatforms    String[]
+  restrictedTopics     String[]
+  websiteUrl           String?
+  blogUrl              String?
+  emailReportRecipient String?
+  approvalPreferences  String   @default("assisted")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  audiences        AudienceProfile[]
+  signals          Signal[]
+  contentItems     ContentItem[]
+  engagementActions EngagementAction[]
+  relationships    Relationship[]
+  opportunities    Opportunity[]
+  performanceMetrics PerformanceMetric[]
+  activitySummaries  ActivitySummary[]
+}
+
+model AudienceProfile {
+  id              String   @id @default(cuid())
+  userId          String
+  name            String
+  industry        String?
+  jobTitles       String[]
+  seniority       String?
+  painPoints      String[]
+  desiredOutcomes String[]
+  buyingTriggers  String[]
+  preferredChannels String[]
+  commonQuestions String[]
+  objections      String[]
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user UserProfile @relation(fields: [userId], references: [id])
+}
+
+model Signal {
+  id               String   @id @default(cuid())
+  userId           String
+  source           String
+  platform         String
+  topic            String
+  keyword          String?
+  summary          String
+  url              String?
+  relevanceScore   Float    @default(0)
+  engagementScore  Float    @default(0)
+  authorityScore   Float    @default(0)
+  revenueScore     Float    @default(0)
+  trendScore       Float    @default(0)
+  urgencyScore     Float    @default(0)
+  confidenceScore  Float    @default(0)
+  compositeScore   Float    @default(0)
+  status           String   @default("new")
+  createdAt        DateTime @default(now())
+
+  user         UserProfile   @relation(fields: [userId], references: [id])
+  contentItems ContentItem[]
+}
+
+model ContentItem {
+  id              String   @id @default(cuid())
+  userId          String
+  sourceSignalId  String?
+  title           String
+  body            String
+  platform        String
+  contentType     String
+  status          String   @default("draft")
+  approvalStatus  String   @default("pending")
+  scheduledTime   DateTime?
+  publishedTime   DateTime?
+  performanceScore Float   @default(0)
+  hookScore       Float    @default(0)
+  clarityScore    Float    @default(0)
+  authorityScore  Float    @default(0)
+  engagementScore Float    @default(0)
+  seoScore        Float    @default(0)
+  ctaScore        Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user         UserProfile        @relation(fields: [userId], references: [id])
+  sourceSignal Signal?            @relation(fields: [sourceSignalId], references: [id])
+  metrics      PerformanceMetric[]
+}
+
+model EngagementAction {
+  id                String   @id @default(cuid())
+  userId            String
+  platform          String
+  actionType        String
+  targetName        String?
+  targetUrl         String?
+  originalContent   String?
+  generatedResponse String?
+  status            String   @default("pending")
+  priorityScore     Float    @default(0)
+  relationshipScore Float    @default(0)
+  opportunityScore  Float    @default(0)
+  requiresReview    Boolean  @default(false)
+  completedAt       DateTime?
+  createdAt         DateTime @default(now())
+
+  user UserProfile @relation(fields: [userId], references: [id])
+}
+
+model Relationship {
+  id                    String   @id @default(cuid())
+  userId                String
+  name                  String
+  platform              String
+  profileUrl            String?
+  organization          String?
+  role                  String?
+  relationshipType      String?
+  priorityScore         Float    @default(0)
+  lastInteractionAt     DateTime?
+  notes                 String?
+  recommendedNextAction String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user UserProfile @relation(fields: [userId], references: [id])
+}
+
+model Opportunity {
+  id                String   @id @default(cuid())
+  userId            String
+  source            String?
+  platform          String?
+  contactName       String?
+  organization      String?
+  opportunityType   String
+  summary           String
+  estimatedValue    Float?
+  priority          String   @default("medium")
+  recommendedAction String?
+  status            String   @default("new")
+  requiresReview    Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user UserProfile @relation(fields: [userId], references: [id])
+}
+
+model PerformanceMetric {
+  id              String   @id @default(cuid())
+  userId          String
+  contentItemId   String?
+  platform        String
+  impressions     Int      @default(0)
+  likes           Int      @default(0)
+  comments        Int      @default(0)
+  shares          Int      @default(0)
+  clicks          Int      @default(0)
+  saves           Int      @default(0)
+  followersGained Int      @default(0)
+  engagementRate  Float    @default(0)
+  conversionCount Int      @default(0)
+  measuredAt      DateTime @default(now())
+
+  user        UserProfile  @relation(fields: [userId], references: [id])
+  contentItem ContentItem? @relation(fields: [contentItemId], references: [id])
+}
+
+model ActivitySummary {
+  id                          String   @id @default(cuid())
+  userId                      String
+  reportingPeriodStart        DateTime
+  reportingPeriodEnd          DateTime
+  contentPublishedCount       Int      @default(0)
+  contentScheduledCount       Int      @default(0)
+  engagementActionsCount      Int      @default(0)
+  commentsRepliedCount        Int      @default(0)
+  relationshipsIdentifiedCount Int     @default(0)
+  opportunitiesIdentifiedCount Int     @default(0)
+  summaryBody                 String
+  emailSent                   Boolean  @default(false)
+  emailSentAt                 DateTime?
+  createdAt                   DateTime @default(now())
+
+  user UserProfile @relation(fields: [userId], references: [id])
+}

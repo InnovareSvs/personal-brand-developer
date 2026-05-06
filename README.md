@@ -1,5 +1,68 @@
 # Personal Brand Developer
-## Claude Code Build Specification
+
+Fully autonomous personal brand growth system — three-agent AI application.
+
+## Setup
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- Anthropic API key
+
+### Install
+
+```bash
+npm install
+```
+
+### Configure environment
+
+```bash
+cp .env.example .env
+# Edit .env with your DATABASE_URL and ANTHROPIC_API_KEY
+```
+
+### Database setup
+
+```bash
+npm run db:generate   # generate Prisma client
+npm run db:migrate    # run migrations (creates tables)
+npm run db:seed       # load example user, audience, and signals
+```
+
+### Run
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+### Test
+
+```bash
+npm test
+```
+
+---
+
+## Architecture
+
+Three agents, one orchestrator:
+
+| Agent | Role |
+|---|---|
+| **Signal Tracker** | Monitors audience, trends, competitors. Scores and ranks signals. |
+| **Content Manager** | Generates and scores platform-specific content from signals. |
+| **Communications Manager** | Lead orchestrator. Runs the other two, deploys content, manages engagement, sends summary emails. |
+
+All agent prompts are editable `.md` files in `src/agents/*/prompt.md` and `src/prompts/`.
+
+Real social API integrations are mocked in `src/services/platform.service.ts` — swap in real adapters without touching agent logic.
+
+---
+
+## Build Specification
 
 You are Claude Code. Build a multi-agent application titled **Personal Brand Developer**.
 
