@@ -20,6 +20,23 @@ model UserProfile {
   blogUrl              String?
   emailReportRecipient String?
   approvalPreferences  String   @default("assisted")
+  platformConfig       Json?
+  keywords             String[]
+  competitors          String[]
+  influencers          String[]
+  offers               String[]
+  primaryGoals         String[]
+  secondaryGoals       String[]
+  escalationEmail      String?
+  reportFrequency      String   @default("every-2-days")
+  monitoringFrequency  String   @default("every-4-hours")
+  monitorIndustries    String[]
+  monitorSubreddits    String[]
+  monitorHashtags      String[]
+  notifyOpportunity    Boolean  @default(true)
+  notifyHighRisk       Boolean  @default(true)
+  notifyAgentRun       Boolean  @default(false)
+  notifyNewSignal      Boolean  @default(true)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
